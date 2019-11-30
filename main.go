@@ -40,6 +40,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Print("convsvg: convert start")
 	if err := convsvg.Convert(gcodeFile, svgFile, styleName); err != nil {
 		log.Fatal(err)
 	}
