@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-func Convert(dst io.Writer, r io.Reader, styleName string) error {
+func Convert(dst io.Writer, r io.Reader, styleName string, offsetX, offsetY, scale float64) error {
 	// find target style
 	stylesMu.Lock()
 	style, ok := styles[styleName]
@@ -30,7 +30,7 @@ func Convert(dst io.Writer, r io.Reader, styleName string) error {
 		if se, ok := token.(xml.StartElement); ok {
 			switch se.Name.Local {
 			case "path": // path标签
-				err = parsePath(encoder, se)
+				err = parsePath(encoder, se, offsetX, offsetY, scale)
 			}
 			if err != nil {
 				return fmt.Errorf("convsvg: <%s> parse error: %v", se.Name.Local, err)

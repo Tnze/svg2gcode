@@ -7,6 +7,7 @@ import (
 
 	"github.com/Tnze/svg2gcode/v2/convsvg"
 	_ "github.com/Tnze/svg2gcode/v2/style.simple"
+	_ "github.com/Tnze/svg2gcode/v2/style.walldraw"
 )
 
 var (
@@ -19,8 +20,8 @@ var (
 
 func main() {
 	flag.Float64Var(&scale, "s", 1, "Scale of final G-code")
-	flag.Float64Var(&scale, "dx", 0, "Offset in X direction")
-	flag.Float64Var(&scale, "dy", 0, "Offset in Y direction")
+	flag.Float64Var(&offsetX, "dx", 0, "Offset in X direction")
+	flag.Float64Var(&offsetY, "dy", 0, "Offset in Y direction")
 	flag.StringVar(&outputFileName, "o", "out.gcode", "Output file name")
 	flag.StringVar(&styleName, "style", "simple", "G-code style")
 	flag.Parse()
@@ -41,7 +42,7 @@ func main() {
 	}
 
 	log.Print("convsvg: convert start")
-	if err := convsvg.Convert(gcodeFile, svgFile, styleName); err != nil {
+	if err := convsvg.Convert(gcodeFile, svgFile, styleName, offsetX, offsetY, scale); err != nil {
 		log.Fatal(err)
 	}
 }

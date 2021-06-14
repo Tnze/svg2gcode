@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-func parsePath(encoder Encoder, element xml.StartElement) error {
+func parsePath(encoder Encoder, element xml.StartElement, offsetX, offsetY, scale float64) error {
 	for _, v := range element.Attr {
 		if v.Name.Local == "d" {
 			if err := encoder.StartPath(); err != nil {
@@ -52,15 +52,35 @@ func parsePath(encoder Encoder, element xml.StartElement) error {
 						}
 
 						if cmd == 'm' || cmd == 'M' {
-							err = encoder.MoveTo(x, y)
+							err = encoder.MoveTo(scale*(x+offsetX), scale*(y+offsetY))
 						} else {
-							err = encoder.LineTo(x, y)
+							err = encoder.LineTo(scale*(x+offsetX), scale*(y+offsetY))
 						}
 						if err != nil {
 							return err
 						}
 						i += 2
 					}
+
+				case 'V', 'v', 'H', 'h':
+					var v float64
+					if v, ok = fs[i].(float64); !ok {
+						return fmt.Errorf("%T(%v) is not a number", fs[i+1], fs[i+1])
+					}
+					switch cmd {
+					case 'V': // 绝对坐标
+						y = v
+					case 'v': // 相对坐标
+						y += v
+					case 'H':
+						x = v
+					case 'h':
+						x += v
+					}
+					if err := encoder.LineTo(scale*(x+offsetX), scale*(y+offsetY)); err != nil {
+						return err
+					}
+					i++
 
 				case 'C', 'c':
 					for i+3*2-1 < len(fs) {
@@ -87,7 +107,7 @@ func parsePath(encoder Encoder, element xml.StartElement) error {
 						y = points[3][1]
 
 						for _, bi := range bezierInsert(points) {
-							if err = encoder.LineTo(bi[0], bi[1]); err != nil {
+							if err = encoder.LineTo(scale*(bi[0]+offsetX), scale*(bi[1]+offsetY)); err != nil {
 								return err
 							}
 						}
@@ -112,7 +132,7 @@ func fieldsD(d string) (v []interface{}, err error) {
 		s  bool
 	)
 	for i, c := range d {
-		if unicode.IsLetter(c) {
+		if unicode.IsLetter(c) && c != 'e' {
 			if s {
 				f, err := strconv.ParseFloat(d[si:i], 64)
 				if err != nil {
