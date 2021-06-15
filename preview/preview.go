@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	const w, h = 220, 260
+	const w, h = 1024, 1024
 	const k = 1.0
 
 	im := image.NewRGBA(image.Rectangle{Max: image.Point{X: w, Y: h}})
