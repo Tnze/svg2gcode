@@ -32,15 +32,14 @@ func main() {
 		var g int
 		var x, y float64
 		fmt.Sscanf(scanner.Text(), "G%d X%f Y%f", &g, &x, &y)
-		// fmt.Println(g, x, y)
 
 		if g == 0 {
-			gc.MoveTo(w/2+y*k, h/2+x*k)
+			gc.MoveTo(w/2+x*k, h/2+y*k)
 		} else {
-			gc.LineTo(w/2+y*k, h/2+x*k)
+			gc.LineTo(w/2+x*k, h/2+y*k)
 		}
 
-		im.SetRGBA(int(w/2+y*k), int(h/2+x*k), color.RGBA{0xFF, 0xFF, 0xFF, 0xff})
+		im.SetRGBA(int(w/2+x*k), int(h/2+y*k), color.RGBA{0xFF, 0xFF, 0xFF, 0xff})
 	}
 	gc.Close()
 	gc.FillStroke()

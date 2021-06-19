@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-func Convert(dst io.Writer, r io.Reader, styleName string, offsetX, offsetY, scale float64) error {
+func Convert(dst io.Writer, r io.Reader, styleName string, offsetX, offsetY, k float64) error {
 	// find target style
 	stylesMu.Lock()
 	style, ok := styles[styleName]
@@ -18,7 +18,9 @@ func Convert(dst io.Writer, r io.Reader, styleName string, offsetX, offsetY, sca
 
 	// parse svg as xml
 	decoder := xml.NewDecoder(r)
-	encoder := style.NewEncoder(dst)
+	encoder := NormMatrix(style.NewEncoder(dst))
+	encoder.translation(offsetX, offsetY)
+	encoder.scale(k, k)
 	for {
 		token, err := decoder.Token()
 		if err == io.EOF {
@@ -30,7 +32,7 @@ func Convert(dst io.Writer, r io.Reader, styleName string, offsetX, offsetY, sca
 		if se, ok := token.(xml.StartElement); ok {
 			switch se.Name.Local {
 			case "path": // path标签
-				err = parsePath(encoder, se, offsetX, offsetY, scale)
+				err = parsePath(encoder, se)
 			}
 			if err != nil {
 				return fmt.Errorf("convsvg: <%s> parse error: %v", se.Name.Local, err)

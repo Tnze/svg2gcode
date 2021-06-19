@@ -8,7 +8,7 @@ import (
 )
 
 const PEN_DOWN = 0.9
-const PEN_UP = 0.3
+const PEN_UP = 0.1
 
 func init() {
 	convsvg.Register("walldraw", walldrawStyle{})
@@ -45,6 +45,6 @@ func (s *walldrawEncoder) LineTo(x, y float64) (err error) {
 		}
 		s.penStatus = true
 	}
-	_, err = fmt.Fprintf(s.dst, "G0 X%f Y%f\n", x, y)
+	_, err = fmt.Fprintf(s.dst, "G1 X%f Y%f\n", x, y)
 	return
 }

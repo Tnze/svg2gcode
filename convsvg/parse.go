@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func parsePath(encoder Encoder, element xml.StartElement, offsetX, offsetY, scale float64) error {
+func parsePath(encoder Encoder, element xml.StartElement) error {
 	for _, v := range element.Attr {
 		if v.Name.Local == "d" {
 			if err := encoder.StartPath(); err != nil {
@@ -49,9 +49,9 @@ func parsePath(encoder Encoder, element xml.StartElement, offsetX, offsetY, scal
 					}
 
 					if cmd == 'm' || cmd == 'M' {
-						err = encoder.MoveTo(scale*(x+offsetX), scale*(y+offsetY))
+						err = encoder.MoveTo(x, y)
 					} else {
-						err = encoder.LineTo(scale*(x+offsetX), scale*(y+offsetY))
+						err = encoder.LineTo(x, y)
 					}
 					if err != nil {
 						return err
@@ -73,7 +73,7 @@ func parsePath(encoder Encoder, element xml.StartElement, offsetX, offsetY, scal
 					case 'h':
 						x += v
 					}
-					if err := encoder.LineTo(scale*(x+offsetX), scale*(y+offsetY)); err != nil {
+					if err := encoder.LineTo(x, y); err != nil {
 						return err
 					}
 
@@ -98,7 +98,7 @@ func parsePath(encoder Encoder, element xml.StartElement, offsetX, offsetY, scal
 					y = points[3][1]
 
 					for _, bi := range bezierInsert(points) {
-						if err = encoder.LineTo(scale*(bi[0]+offsetX), scale*(bi[1]+offsetY)); err != nil {
+						if err = encoder.LineTo(bi[0], bi[1]); err != nil {
 							return err
 						}
 					}
